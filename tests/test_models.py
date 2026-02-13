@@ -1,4 +1,3 @@
-
 from oxplow.core.decorators import Postgres
 from oxplow.core.models import Model
 

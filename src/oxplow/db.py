@@ -3,10 +3,11 @@ from abc import ABC, abstractmethod
 import oxpg
 from oxpg import Client as oxpgClient
 from oxpg import InterfaceError
+
 from oxplow.registry import registry
-from .types import DatabaseType
 
 from .errors import ConfigurationError
+from .types import DatabaseType
 
 
 class Database(ABC):
