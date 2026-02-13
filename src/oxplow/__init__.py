@@ -1,4 +1,4 @@
-from .core import Model, Postgres
+from .core import Field, Model, Postgres
 from .db import PostgresDatabase
 from .errors import ConfigurationError, DatabaseConnectionError
 
@@ -7,5 +7,6 @@ __all__ = [
     "ConfigurationError",
     "DatabaseConnectionError",
     "Model",
+    "Field",
     "Postgres",
 ]

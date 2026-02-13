@@ -1,4 +1,4 @@
 from .decorators import Postgres
-from .models import Model
+from .models import Field, Model
 
-__all__ = ["Model", "Postgres"]
+__all__ = ["Model", "Postgres", "Field"]
