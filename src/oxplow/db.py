@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
 from enum import Enum
+
+import oxpg
 from oxpg import Client as oxpgClient
 from oxpg import InterfaceError
+
 from .errors import ConfigurationError
-import oxpg
 
 
 class DatabaseType(Enum):
@@ -18,7 +20,7 @@ class Database(ABC):
         self.engine = engine
 
     @abstractmethod
-    def disconnect(self):
+    def disconnect(self) -> None:
         pass
 
 
@@ -26,19 +28,28 @@ class PostgresDatabase(Database):
     engine = DatabaseType.POSTGRESQL
     client: oxpgClient
 
-    def __init__(self, *, dsn: str | None = None, host: str | None = None, port: int | None = None,
-                 user: str | None = None, password: str | None = None,
-                 db: str | None = None):
+    def __init__(
+        self,
+        *,
+        dsn: str | None = None,
+        host: str | None = None,
+        port: int | None = None,
+        user: str | None = None,
+        password: str | None = None,
+        db: str | None = None,
+    ) -> None:
         if not dsn and not (host and port and user and password and db):
             raise ConfigurationError(
                 engine="PostgreSQL",
-                reason="Must provide either dsn or all connection parameters"
+                reason="Must provide either dsn or all connection parameters",
             )
+
         if dsn and (host or port or user or password or db):
             raise ConfigurationError(
                 engine="PostgreSQL",
-                reason="Cannot provide both dsn and individual connection parameters"
+                reason="Cannot provide both dsn and individual connection parameters",
             )
+
         try:
             if dsn:
                 self.client = oxpg.connect(dsn)
@@ -48,20 +59,20 @@ class PostgresDatabase(Database):
                     user=user,
                     password=password,
                     port=port if port is not None else 5432,
-                    db=db if db is not None else "postgres"
+                    db=db if db is not None else "postgres",
                 )
         except InterfaceError as ie:
             raise ConfigurationError(
                 engine="PostgreSQL",
                 reason="Failed to create client with provided configuration",
-                source=ie
+                source=ie,
             ) from ie
         except Exception as e:
             raise ConfigurationError(
                 engine="PostgreSQL",
                 reason="Unexpected error during client initialization",
-                source=e
+                source=e,
             ) from e
 
-    def disconnect(self):
+    def disconnect(self) -> None:
         pass

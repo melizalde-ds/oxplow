@@ -20,7 +20,8 @@ class OxplowError(Exception):
 
     def __repr__(self) -> str:
         fields = {
-            k: v for k, v in self.__dict__.items()
+            k: v
+            for k, v in self.__dict__.items()
             if not k.startswith("_") and k != "source"
         }
         parts = [f"{k}={v!r}" for k, v in fields.items()]
