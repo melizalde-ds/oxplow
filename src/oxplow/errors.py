@@ -29,6 +29,23 @@ class OxplowError(Exception):
         return f"{type(self).__name__}({', '.join(parts)})"
 
 
+class ConfigurationError(OxplowError):
+    """Invalid configuration provided to a database client."""
+
+    _template = "invalid configuration for {engine}: {reason}"
+
+    def __init__(
+        self,
+        *,
+        engine: str,
+        reason: str,
+        source: Exception | None = None,
+    ) -> None:
+        self.engine: str
+        self.reason: str
+        super().__init__(source=source, engine=engine, reason=reason)
+
+
 class ConnectionError(OxplowError):
     """Failed to establish a database connection."""
 

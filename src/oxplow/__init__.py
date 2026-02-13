@@ -1,2 +1,3 @@
-def hello() -> str:
-    return "Hello from oxplow!"
+from .db import PostgresDatabase
+
+__all__ = ["PostgresDatabase"]
