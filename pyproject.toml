@@ -19,7 +19,7 @@ dev = ["pyright>=1.1.408", "pytest>=9.0.2", "ruff>=0.15.1"]
 
 [tool.ruff]
 line-length = 88
-target-version = "py312"
+target-version = "py314"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
@@ -31,7 +31,7 @@ quote-style = "double"
 indent-style = "space"
 
 [tool.pyright]
-pythonVersion = "3.12"
+pythonVersion = "3.14"
 pythonPlatform = "Linux"
 typeCheckingMode = "strict"
 venvPath = "."
