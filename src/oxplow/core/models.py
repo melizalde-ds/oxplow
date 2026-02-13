@@ -1,17 +1,23 @@
 from __future__ import annotations
 
 import typing
-from typing import Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 import pydantic
 from pydantic import BaseModel
+
+from oxplow.query.sql import PostgresEngine
+from oxplow.types import DatabaseType
+
+if TYPE_CHECKING:
+    from oxplow.db import Database
 
 _MISSING: Any = object()
 
 T = TypeVar("T")
 
 
-class Field(Generic[T]):
+class Field[T]:
     def __init__(
         self,
         *,
@@ -50,8 +56,8 @@ class Field(Generic[T]):
 class Model:
     __table__: str
     __fields__: dict[str, Field[Any]]
-    __db__: object
-    __engine_type__: object
+    __db__: Database
+    __engine_type__: str
     _pydantic_model: type[BaseModel]
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
@@ -112,15 +118,40 @@ class Model:
 
     def _to_dict(self) -> dict[str, Any]:
         return {
-            name: getattr(self, name)
-            for name in self.__fields__
-            if hasattr(self, name)
+            name: getattr(self, name) for name in self.__fields__ if hasattr(self, name)
         }
+
+    @classmethod
+    def create(cls, **kwargs: Any) -> Model:
+        cls.validate(cls(**kwargs))
+        result = []
+        match cls.__engine_type__:
+            case DatabaseType.POSTGRESQL:
+                result = PostgresEngine.insert(
+                    cls.__db__, cls.__table__, kwargs)
+            case DatabaseType.MONGODB:
+                print(f"Inserting into {cls.__table__}: {kwargs}")
+            case _:
+                raise NotImplementedError(
+                    f"Unsupported database type: {cls.__engine_type__}"
+                )
+        return cls(**result[0]) if result else cls(**kwargs)
+
+    @classmethod
+    def get(cls, **kwargs: Any) -> Model:
+        return cls(**kwargs)
+
+    @classmethod
+    def update(cls, **kwargs: Any) -> Model:
+        return cls(**kwargs)
+
+    @classmethod
+    def delete(cls, **kwargs: Any) -> None:
+        pass
 
     def __repr__(self) -> str:
         field_strs = ", ".join(
-            f"{name}={getattr(self, name, _MISSING)!r}"
-            for name in self.__fields__
+            f"{name}={getattr(self, name, _MISSING)!r}" for name in self.__fields__
         )
         return f"{self.__class__.__name__}({field_strs})"
 
