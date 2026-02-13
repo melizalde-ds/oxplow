@@ -9,15 +9,22 @@ from .errors import ConfigurationError
 
 
 class DatabaseType(Enum):
-    POSTGRESQL = "postgresql"
-    MONGODB = "mongodb"
+    POSTGRESQL = "Postgresql"
+    MONGODB = "Mongodb"
+
+    def __str__(self) -> str:
+        return self.value
+
+    def __repr__(self) -> str:
+        return self.__str__()
 
 
 class Database(ABC):
+    name: str
     engine: DatabaseType
 
-    def __init__(self, engine: DatabaseType):
-        self.engine = engine
+    def __init__(self, name: str):
+        self.name = name
 
     @abstractmethod
     def disconnect(self) -> None:
@@ -30,15 +37,16 @@ class PostgresDatabase(Database):
 
     def __init__(
         self,
-        *,
         dsn: str | None = None,
         host: str | None = None,
         port: int | None = None,
         user: str | None = None,
         password: str | None = None,
         db: str | None = None,
+        name: str = "postgres",
     ) -> None:
-        if not dsn and not (host and port and user and password and db):
+        super().__init__(name=name)
+        if not dsn and not (host and user and password or (db or port)):
             raise ConfigurationError(
                 engine="PostgreSQL",
                 reason="Must provide either dsn or all connection parameters",
