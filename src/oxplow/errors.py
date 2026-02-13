@@ -33,7 +33,7 @@ class OxplowError(Exception):
 class ConfigurationError(OxplowError):
     """Invalid configuration provided to a database client."""
 
-    _template = "invalid configuration for {engine}: {reason}"
+    _template = "Invalid configuration for {engine}: {reason}"
 
     def __init__(
         self,
@@ -47,10 +47,10 @@ class ConfigurationError(OxplowError):
         super().__init__(source=source, engine=engine, reason=reason)
 
 
-class ConnectionError(OxplowError):
+class DatabaseConnectionError(OxplowError):
     """Failed to establish a database connection."""
 
-    _template = "failed to connect to {engine} at {target}"
+    _template = "Failed to connect to {engine} at {target}"
 
     def __init__(
         self,

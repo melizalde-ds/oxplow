@@ -77,8 +77,7 @@ class TestPostgresDatabaseUnit:
     def test_interface_error_wrapped_as_configuration_error(
         self, mock_connect: MagicMock
     ) -> None:
-        mock_connect.side_effect = InterfaceError(
-            "boom")  # type: ignore[arg-type]
+        mock_connect.side_effect = InterfaceError("boom")  # type: ignore[arg-type]
 
         with pytest.raises(ConfigurationError, match="Failed to create client"):
             PostgresDatabase(dsn=DSN)

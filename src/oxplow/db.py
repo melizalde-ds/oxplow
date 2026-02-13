@@ -1,26 +1,33 @@
 from abc import ABC, abstractmethod
-from enum import Enum
 
 import oxpg
 from oxpg import Client as oxpgClient
 from oxpg import InterfaceError
 
+from oxplow.registry import registry
+
 from .errors import ConfigurationError
-
-
-class DatabaseType(Enum):
-    POSTGRESQL = "postgresql"
-    MONGODB = "mongodb"
+from .types import DatabaseType
 
 
 class Database(ABC):
+    name: str
     engine: DatabaseType
+    __db_engine__: str
 
-    def __init__(self, engine: DatabaseType):
-        self.engine = engine
+    def __init__(self, name: str):
+        self.name = name
 
     @abstractmethod
     def disconnect(self) -> None:
+        pass
+
+    @abstractmethod
+    def __repr__(self) -> str:
+        pass
+
+    @abstractmethod
+    def __str__(self) -> str:
         pass
 
 
@@ -30,15 +37,16 @@ class PostgresDatabase(Database):
 
     def __init__(
         self,
-        *,
         dsn: str | None = None,
         host: str | None = None,
         port: int | None = None,
         user: str | None = None,
         password: str | None = None,
         db: str | None = None,
+        name: str = "postgres",
     ) -> None:
-        if not dsn and not (host and port and user and password and db):
+        super().__init__(name=name)
+        if not dsn and not (host and user and password or (db or port)):
             raise ConfigurationError(
                 engine="PostgreSQL",
                 reason="Must provide either dsn or all connection parameters",
@@ -61,6 +69,7 @@ class PostgresDatabase(Database):
                     port=port if port is not None else 5432,
                     db=db if db is not None else "postgres",
                 )
+            registry.register_database(self)
         except InterfaceError as ie:
             raise ConfigurationError(
                 engine="PostgreSQL",
@@ -76,3 +85,9 @@ class PostgresDatabase(Database):
 
     def disconnect(self) -> None:
         pass
+
+    def __repr__(self) -> str:
+        return f"PostgresDatabase(name={self.name})"
+
+    def __str__(self) -> str:
+        return f"PostgresDatabase(name={self.name})"

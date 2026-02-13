@@ -1,4 +1,11 @@
+from .core import Model, Postgres
 from .db import PostgresDatabase
-from .errors import ConfigurationError, ConnectionError
+from .errors import ConfigurationError, DatabaseConnectionError
 
-__all__ = ["PostgresDatabase", "ConfigurationError", "ConnectionError"]
+__all__ = [
+    "PostgresDatabase",
+    "ConfigurationError",
+    "DatabaseConnectionError",
+    "Model",
+    "Postgres",
+]
