@@ -1,33 +1,32 @@
 from abc import ABC, abstractmethod
-from enum import Enum
 
 import oxpg
 from oxpg import Client as oxpgClient
 from oxpg import InterfaceError
+from oxplow.registry import registry
+from .types import DatabaseType
 
 from .errors import ConfigurationError
-
-
-class DatabaseType(Enum):
-    POSTGRESQL = "Postgresql"
-    MONGODB = "Mongodb"
-
-    def __str__(self) -> str:
-        return self.value
-
-    def __repr__(self) -> str:
-        return self.__str__()
 
 
 class Database(ABC):
     name: str
     engine: DatabaseType
+    __db_engine__: str
 
     def __init__(self, name: str):
         self.name = name
 
     @abstractmethod
     def disconnect(self) -> None:
+        pass
+
+    @abstractmethod
+    def __repr__(self) -> str:
+        pass
+
+    @abstractmethod
+    def __str__(self) -> str:
         pass
 
 
@@ -69,6 +68,7 @@ class PostgresDatabase(Database):
                     port=port if port is not None else 5432,
                     db=db if db is not None else "postgres",
                 )
+            registry.register_database(self)
         except InterfaceError as ie:
             raise ConfigurationError(
                 engine="PostgreSQL",
@@ -84,3 +84,9 @@ class PostgresDatabase(Database):
 
     def disconnect(self) -> None:
         pass
+
+    def __repr__(self) -> str:
+        return f"PostgresDatabase(name={self.name})"
+
+    def __str__(self) -> str:
+        return f"PostgresDatabase(name={self.name})"

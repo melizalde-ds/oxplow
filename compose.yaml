@@ -1,5 +1,5 @@
 services:
-  pg:
+  pg1:
     image: postgres:17
     environment:
       POSTGRES_USER: postgres
@@ -7,6 +7,20 @@ services:
       POSTGRES_DB: test_db
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d test_db"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  pg2:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: test_db
+    ports:
+      - "5433:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d test_db"]
       interval: 2s
